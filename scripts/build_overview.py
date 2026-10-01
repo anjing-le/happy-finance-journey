@@ -38,6 +38,35 @@ def md_node(path, kind='文档'):
     return node
 
 
+def knowledge_sections(path):
+    """Expose outline headings as sections, without creating directories."""
+    text = path.read_text()
+    headings = list(re.finditer(r'^(#{2,3}) (.+)$', text, re.M))
+    sections = []
+    parent = None
+    rel = path.relative_to(ROOT).as_posix()
+    for index, heading in enumerate(headings):
+        level, title = len(heading[1]), plain(heading[2])
+        if title == '已整理条目':
+            continue
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        body = text[heading.end():end].strip()
+        body = re.split(r'^\[目标与维护规则\]', body, maxsplit=1, flags=re.M)[0].strip()
+        anchor = re.sub(r'[^\w\- ]', '', title).lower().replace(' ', '-')
+        node = {'title': title, 'description': plain(body), 'path': rel,
+                'kind': '章节', 'url': GITHUB + quote(rel) + '#' + quote(anchor),
+                'children': [], 'expanded': level == 2}
+        if level == 2:
+            sections.append(node)
+            parent = node
+        elif parent is not None:
+            parent['children'].append(node)
+    for section in sections:
+        if not section['description'] and section['children']:
+            section['description'] = '章节：' + '、'.join(child['title'] for child in section['children'])
+    return sections
+
+
 def directory(path):
     readme = path / 'README.md'
     node = md_node(readme, '目录') if readme.exists() else {
@@ -48,6 +77,8 @@ def directory(path):
             node['children'].append(directory(entry))
         elif entry.suffix == '.md' and entry.name != 'README.md':
             node['children'].append(md_node(entry))
+    if path == ROOT / 'knowledge' and readme.exists():
+        node['children'] = knowledge_sections(readme) + node['children']
     if not readme.exists():
         node['description'] = '包含：' + '、'.join(child['title'] for child in node['children'])
     return node
