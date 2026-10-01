@@ -40,7 +40,8 @@ function html(markdown, source) {
   const output = marked.parser(tokens);
   return sanitizeHtml(output, {
     allowedTags: [...sanitizeHtml.defaults.allowedTags, 'img'],
-    allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, img: ['src', 'alt', 'width', 'height', 'loading'], h2: ['id'], h3: ['id'] },
+    allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, img: ['src', 'alt', 'width', 'height', 'loading', 'decoding'], h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'] },
+    transformTags: { img: (tagName, attribs) => ({ tagName, attribs: { ...attribs, loading: 'lazy', decoding: 'async' } }) },
   });
 }
 const docs = [];

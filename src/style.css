@@ -4,9 +4,9 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
 
 /* Module colors apply to both desktop columns and mobile tabs. */
-#knowledge,[data-column=knowledge]{--module-color:#4e6fa7;--module-tint:#f0f4fc;--module-border:#dce5f5}
-#practices,[data-column=practices]{--module-color:#477c68;--module-tint:#eef7f2;--module-border:#d8eadd}
-#activities,[data-column=activities]{--module-color:#a47143;--module-tint:#fcf4eb;--module-border:#f0dfca}
+#knowledge,[data-column=knowledge],[data-module=knowledge]{--module-color:#4e6fa7;--module-tint:#f0f4fc;--module-border:#dce5f5}
+#practices,[data-column=practices],[data-module=practices]{--module-color:#477c68;--module-tint:#eef7f2;--module-border:#d8eadd}
+#activities,[data-column=activities],[data-module=activities]{--module-color:#a47143;--module-tint:#fcf4eb;--module-border:#f0dfca}
 .column{padding:22px 12px 32px;min-height:180px;background:transparent}
 .column-label{text-align:center;color:var(--module-color)}
 .column .block{background:var(--module-tint);border-color:var(--module-border)}
@@ -30,8 +30,18 @@
   .column-switch{position:sticky;top:0;z-index:1;margin:0;gap:8px;background:#fbfbfc;padding:calc(12px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px))}
   .column-switch button{font-size:14px}
   .board{gap:0;padding:0;scroll-padding:0}
-  .column{flex:0 0 100%;padding:12px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));scroll-margin:0}
+  .column{flex:0 0 100%;padding:12px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));scroll-margin:calc(68px + env(safe-area-inset-top, 0px)) 0 0}
   .column:last-child{margin-right:0}
   .detail{inset:calc(12px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));margin:0;width:auto;height:auto;max-width:none;max-height:none}
   .reader{padding:calc(28px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) calc(32px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px))}
 }
+
+/* Reading surfaces inherit the same module palette as their entry cards. */
+.detail[data-module]{background:var(--module-tint);border-color:var(--module-border)}
+.detail[data-module] .detail-top{background:#ffffff80;border-color:var(--module-border)}
+.detail[data-module] .detail-title,.detail[data-module] .close-detail{color:var(--module-color)}
+.detail[data-module] .close-detail:hover{background:var(--module-border)}
+[data-module] .prose h1,[data-module] .prose h2,[data-module] .prose h3,[data-module] .prose a,[data-module] .back-link{color:var(--module-color, #4e6fa7)}
+[data-module] .prose pre{background:#ffffff80}
+[data-module] .prose td,[data-module] .prose th{border-color:var(--module-border, #ececf1)}
+button:focus-visible,a:focus-visible{outline-color:var(--module-color, #4e6fa7)}
