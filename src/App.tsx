@@ -20,13 +20,16 @@ function Home() {
     return () => document.body.classList.remove('detail-open');
   }, [reading]);
   function jump(id: string) {
+    const parent = board.current;
+    const column = document.getElementById(id);
+    if (!parent || !column) return;
     setActiveColumn(id);
-    document.getElementById(id)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest', inline: 'start' });
+    parent.scrollTo({ left: parent.scrollLeft + column.getBoundingClientRect().left - parent.getBoundingClientRect().left, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }
   function syncColumn() {
     const parent = board.current;
     if (!parent) return;
-    const left = parent.getBoundingClientRect().left + 24;
+    const left = parent.getBoundingClientRect().left;
     const closest = [...parent.children].sort((a, b) => Math.abs(a.getBoundingClientRect().left - left) - Math.abs(b.getBoundingClientRect().left - left))[0];
     if (closest) setActiveColumn(closest.id);
   }

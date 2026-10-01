@@ -23,3 +23,15 @@
 .chapter-category{flex:0 0 auto;font-size:10px;line-height:1.6;color:var(--module-color);background:#ffffffa6;border-radius:5px;padding:4px 6px;white-space:nowrap}
 .chapter-title{min-width:0}
 @media(max-width:720px){.column .block{padding-inline:12px;gap:8px}.chapter-category{font-size:10px;padding-inline:5px}}
+
+/* Keep each mobile column within the viewport and clear iPhone system UI. */
+@media(max-width:720px){
+  .workspace{padding:0 0 calc(32px + env(safe-area-inset-bottom, 0px))}
+  .column-switch{position:sticky;top:0;z-index:1;margin:0;gap:8px;background:#fbfbfc;padding:calc(12px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px))}
+  .column-switch button{font-size:14px}
+  .board{gap:0;padding:0;scroll-padding:0}
+  .column{flex:0 0 100%;padding:12px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));scroll-margin:0}
+  .column:last-child{margin-right:0}
+  .detail{inset:calc(12px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));margin:0;width:auto;height:auto;max-width:none;max-height:none}
+  .reader{padding:calc(28px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) calc(32px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px))}
+}
