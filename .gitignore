@@ -5,3 +5,9 @@
 __pycache__/
 node_modules/
 .pocket/
+dist/
+.ssr/
+.wrangler/
+src/generated/
+public/assets/
+public/content/

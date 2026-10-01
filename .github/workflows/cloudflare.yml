@@ -1,0 +1,24 @@
+name: Trigger Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-pages-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger build from main
+        env:
+          DEPLOY_HOOK: ${{ secrets.CF_PAGES_DEPLOY_HOOK }}
+        run: |
+          test -n "$DEPLOY_HOOK"
+          curl --fail-with-body --silent --show-error --request POST "$DEPLOY_HOOK"
