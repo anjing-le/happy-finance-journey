@@ -51,9 +51,12 @@ for (const file of pages) {
 }
 const knowledge = await readFile('knowledge/README.md', 'utf8');
 const chunks = knowledge.split(/(?=^#{2,3} )/m).slice(1);
+let category = '';
 const outline = chunks.filter(chunk => !chunk.startsWith('## 已整理条目')).map((chunk, index) => {
   const [, heading, title] = chunk.match(/^(#{2,3}) (.+)\n/);
-  return { id: `chapter-${index}`, title, group: heading === '##' && title.startsWith('主线'), html: html(chunk.replace(/^#{2,3} .+\n/, ''), 'knowledge/README.md') };
+  const group = heading === '##' && title.startsWith('主线');
+  if (heading === '##') category = group ? title.replace(/^主线[^：]*：/, '') : '';
+  return { id: `chapter-${index}`, title, group, category: heading === '###' ? category : '', html: html(chunk.replace(/^#{2,3} .+\n/, ''), 'knowledge/README.md') };
 });
 await rm('public/content', { recursive: true, force: true });
 for (const image of images) {
