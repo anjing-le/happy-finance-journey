@@ -9,4 +9,4 @@ for (const page of pages) {
   await writeFile(target, html);
 }
 await rm('.ssr', { recursive: true });
-console.log(`Prerendered ${pages.length} pages. No client JavaScript required.`);
+console.log(`Prerendered ${pages.length} pages. Hydration enables the reading dialog and mobile column navigation.`);

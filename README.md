@@ -37,7 +37,7 @@ Happy Finance Journey 是我对金融领域的长期学习与实践记录，以�
 - `knowledge/`、`practices/`、`activities/`：Markdown 内容，继续作为唯一正文来源。
 - `src/`：React + TypeScript 页面组件与样式。
 - `scripts/content.mjs`：读取 Markdown、生成章节和文章数据，检查本地文档链接并清理 HTML。
-- `scripts/prerender.mjs`：预渲染完整 HTML 到 `dist/`，线上阅读不依赖客户端 JavaScript。
+- `scripts/prerender.mjs`：预渲染完整 HTML 到 `dist/`；客户端接管阅读浮窗与手机栏目切换。
 - `assets/`：原始公共素材；构建时复制到网站。
 
 ### 本地开发
@@ -62,3 +62,5 @@ npm run preview
 - `overview.html` 由同一前端工程生成，兼容旧收藏地址。
 
 继续迭代：先维护工程与框架，再逐篇打磨内容，最后根据真实使用反馈改进。
+
+呈现采用左、中、右三列：知识、最佳实践、活动。首页不展示品牌大标题、海报或宣传文案；知识主线用小标题标记，章节保持同层卡片，点击后用阅读浮窗展示。手机端横向滑动或点击栏目切换。

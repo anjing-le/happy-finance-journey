@@ -1,31 +1,52 @@
+import { useEffect, useRef, useState } from 'react';
 import content from './generated/content.json';
 
 const base = __SITE_BASE__;
 const github = 'https://github.com/anjing-le/happy-finance-journey';
+const columns = [{ id: 'knowledge', label: '知识' }, { id: 'practices', label: '最佳实践' }, { id: 'activities', label: '活动' }];
+type Reading = { title: string; html: string; source?: string };
 function Markdown({ html }: { html: string }) { return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />; }
-function Header() {
-  return <header className="site-header"><a className="brand" href={base}><span className="brand-mark">F</span><span>anjing-finance</span></a><nav aria-label="主导航"><a href={`${base}#knowledge`}>知识</a><a href={`${base}#practices`}>最佳实践</a><a href={`${base}#activities`}>活动</a></nav></header>;
-}
-function Footer() {
-  return <footer><span>一起学，一起做，不断变好。</span><div><a href={`${base}about.html`}>目标与维护规则</a><a href={github}>GitHub ↗</a></div></footer>;
-}
-function Articles({ module }: { module: string }) {
+function Articles({ module, open }: { module: string; open: (reading: Reading) => void }) {
   const articles = content.docs.filter(doc => doc.module === module && !doc.file.endsWith('/README.md') && !doc.file.endsWith('/DESIGN.md'));
-  if (!articles.length) return <p className="empty">{module === 'knowledge' ? '当前收录的是学习脉络，具体知识正文逐篇打磨。' : '尚未收录。先从实际用过的方法开始，记录做法、依据和限制。'}</p>;
-  return <ul className="article-list">{articles.map(doc => <li key={doc.file}><a href={`${base}${doc.route}`}>{doc.title}<span aria-hidden="true">↗</span></a></li>)}</ul>;
+  return articles.length ? <ul className="slots">{articles.map(doc => <li key={doc.file}><button className="block" aria-haspopup="dialog" onClick={() => open({ title: doc.title, html: doc.html, source: doc.file })}>{doc.title}</button></li>)}</ul> : null;
 }
 function Home() {
+  const [reading, setReading] = useState<Reading | null>(null);
+  const [activeColumn, setActiveColumn] = useState('knowledge');
+  const dialog = useRef<HTMLDialogElement>(null);
+  const board = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (reading) { dialog.current?.showModal(); document.body.classList.add('detail-open'); }
+    else { dialog.current?.close(); document.body.classList.remove('detail-open'); }
+    return () => document.body.classList.remove('detail-open');
+  }, [reading]);
+  function jump(id: string) {
+    setActiveColumn(id);
+    document.getElementById(id)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest', inline: 'start' });
+  }
+  function syncColumn() {
+    const parent = board.current;
+    if (!parent) return;
+    const left = parent.getBoundingClientRect().left + 24;
+    const closest = [...parent.children].sort((a, b) => Math.abs(a.getBoundingClientRect().left - left) - Math.abs(b.getBoundingClientRect().left - left))[0];
+    if (closest) setActiveColumn(closest.id);
+  }
   return <>
-    <section className="hero"><div className="hero-copy"><p className="eyebrow">HAPPY FINANCE JOURNEY</p><h1>理解市场，<br />形成自己的判断。</h1><p className="intro">以股票投资与交易为实践方向，<br className="desktop-break" />积累知识，检验方法，逐步形成自己的体系。</p><a className="start-link" href="#knowledge">从知识开始 <span aria-hidden="true">↓</span></a></div><img className="hero-art" src={`${base}content/assets/journey-poster.png`} width="1254" height="1254" alt="黄发黑色 hoodie 的安静，在金融知识、资料分析和手机股票软件实践中学习。" /></section>
-    <section id="knowledge" className="section"><div className="section-heading"><div><p className="eyebrow">01 / KNOWLEDGE</p><h2>知识</h2></div><p>先词汇，再关系，再理论，再系统。</p></div>
-      <div className="outline">{content.outline.map(item => item.group ? <h3 className="group-title" key={item.id}>{item.title}</h3> : <details className="chapter" id={item.id} key={item.id}><summary><span>{item.title}</span><span className="expand" aria-hidden="true">+</span></summary><Markdown html={item.html} /></details>)}</div>
-      <div className="articles-heading"><h3>已整理条目</h3><Articles module="knowledge" /></div>
-    </section>
-    <section id="practices" className="section"><div className="section-heading"><div><p className="eyebrow">02 / PRACTICES</p><h2>最佳实践</h2></div><p>方法经过实践，再回头检查。</p></div><div className="practice-note"><p>解决什么问题 · 怎么做 · 何时适用 · 验证依据 · 有什么限制</p><Articles module="practices" /></div></section>
-    <section id="activities" className="activity-pause"><div><h2>活动 <span>暂缓</span></h2><p>当前先积累知识与最佳实践。</p></div><span className="pause-symbol" aria-hidden="true">Ⅱ</span></section>
+    <main className="workspace" aria-label="金融知识与实践">
+      <nav className="column-switch" aria-label="切换栏目">{columns.map(column => <button key={column.id} onClick={() => jump(column.id)} aria-current={activeColumn === column.id ? 'true' : undefined}>{column.label}</button>)}</nav>
+      <div className="board" ref={board} onScroll={syncColumn}>
+        <section id="knowledge" className="column" aria-label="知识"><h2 className="column-label">知识</h2><div className="slots">{content.outline.map(item => item.group ? <h3 className="group-label" key={item.id}>{item.title}</h3> : <button className="block" key={item.id} aria-haspopup="dialog" onClick={() => setReading({ title: item.title, html: item.html, source: 'knowledge/README.md' })}>{item.title}</button>)}</div><Articles module="knowledge" open={setReading} /></section>
+        <section id="practices" className="column" aria-label="最佳实践"><h2 className="column-label">最佳实践</h2><Articles module="practices" open={setReading} />{!content.docs.some(doc => doc.module === 'practices' && !doc.file.endsWith('/README.md') && !doc.file.endsWith('/DESIGN.md')) && <p className="empty">尚未收录</p>}</section>
+        <section id="activities" className="column" aria-label="活动"><h2 className="column-label">活动</h2><p className="empty">暂缓</p></section>
+      </div>
+    </main>
+    <dialog className="detail" ref={dialog} aria-label={reading?.title || '内容详情'} onClose={() => setReading(null)} onClick={event => { if (event.target === event.currentTarget) setReading(null); }}>
+      <div className="detail-top"><span className="detail-title">{reading?.title}</span>{reading?.source && <a className="source-link" href={`${github}/blob/main/${reading.source}`} target="_blank" rel="noopener noreferrer">原文 ↗</a>}<button className="close-detail" aria-label="关闭详情" onClick={() => setReading(null)}>×</button></div>
+      <div className="detail-scroll">{reading && <Markdown html={reading.html} />}</div>
+    </dialog>
   </>;
 }
 export default function App({ route = '' }: { route?: string }) {
   const doc = content.docs.find(item => item.route === route);
-  return <><a className="skip-link" href="#main">跳到正文</a><Header /><main id="main">{doc ? <article className="reader"><a className="back-link" href={`${base}${doc.module === 'knowledge' || doc.module === 'practices' ? '#' + doc.module : ''}`}>← 返回首页</a><Markdown html={doc.html} /><a className="source-link" href={`${github}/blob/main/${doc.file}`}>查看 Markdown 原文 ↗</a></article> : <Home />}</main><Footer /></>;
+  return doc ? <main className="reader"><a className="back-link" href={`${base}${doc.module === 'knowledge' || doc.module === 'practices' ? '#' + doc.module : ''}`}>← 返回</a><Markdown html={doc.html} /><a className="source-link" href={`${github}/blob/main/${doc.file}`}>Markdown 原文 ↗</a></main> : <Home />;
 }

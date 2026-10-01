@@ -1,3 +1,6 @@
-import { createRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App';
-createRoot(document.getElementById('root')!).render(<App route={decodeURI(location.pathname).replace(__SITE_BASE__, '')} />);
+const root = document.getElementById('root')!;
+const app = <App route={decodeURI(location.pathname).replace(__SITE_BASE__, '')} />;
+if (root.querySelector('main')) hydrateRoot(root, app);
+else createRoot(root).render(app);
