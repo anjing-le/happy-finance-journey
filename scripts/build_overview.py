@@ -43,7 +43,6 @@ def knowledge_sections(path):
     text = path.read_text()
     headings = list(re.finditer(r'^(#{2,3}) (.+)$', text, re.M))
     sections = []
-    parent = None
     rel = path.relative_to(ROOT).as_posix()
     for index, heading in enumerate(headings):
         level, title = len(heading[1]), plain(heading[2])
@@ -54,16 +53,9 @@ def knowledge_sections(path):
         body = re.split(r'^\[目标与维护规则\]', body, maxsplit=1, flags=re.M)[0].strip()
         anchor = re.sub(r'[^\w\- ]', '', title).lower().replace(' ', '-')
         node = {'title': title, 'description': plain(body), 'path': rel,
-                'kind': '章节', 'url': GITHUB + quote(rel) + '#' + quote(anchor),
-                'children': [], 'expanded': level == 2}
-        if level == 2:
-            sections.append(node)
-            parent = node
-        elif parent is not None:
-            parent['children'].append(node)
-    for section in sections:
-        if not section['description'] and section['children']:
-            section['description'] = '章节：' + '、'.join(child['title'] for child in section['children'])
+                'kind': '分组' if level == 2 and title.startswith('主线') else '章节',
+                'url': GITHUB + quote(rel) + '#' + quote(anchor), 'children': []}
+        sections.append(node)
     return sections
 
 
@@ -79,6 +71,7 @@ def directory(path):
             node['children'].append(md_node(entry))
     if path == ROOT / 'knowledge' and readme.exists():
         node['children'] = knowledge_sections(readme) + node['children']
+        node['flat'] = True
     if not readme.exists():
         node['description'] = '包含：' + '、'.join(child['title'] for child in node['children'])
     return node
