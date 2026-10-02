@@ -45,3 +45,8 @@
 [data-module] .prose pre{background:#ffffff80}
 [data-module] .prose td,[data-module] .prose th{border-color:var(--module-border, #ececf1)}
 button:focus-visible,a:focus-visible{outline-color:var(--module-color, #4e6fa7)}
+
+/* The entry card supplies the title; the dialog focuses on the body. */
+.detail[data-module] .detail-top{justify-content:flex-end;min-height:64px;padding:10px 18px;background:transparent;border:0}
+.detail[data-module] .detail-scroll{padding-top:8px}
+.detail .prose :is(h1,h2,h3,h4,h5,h6){display:none}

@@ -52,7 +52,7 @@ function Home() {
       </div>
     </main>
     <dialog className="detail" data-module={reading?.module} ref={dialog} aria-label={reading?.title || '内容详情'} onClose={() => setReading(null)} onClick={event => { if (event.target === event.currentTarget) setReading(null); }}>
-      <div className="detail-top"><span className="detail-title">{reading?.title}</span><button className="close-detail" aria-label="关闭详情" onClick={() => setReading(null)}>×</button></div>
+      <div className="detail-top"><button className="close-detail" aria-label="关闭详情" onClick={() => setReading(null)}>×</button></div>
       <div className="detail-scroll">{reading && <Markdown html={reading.html} />}</div>
     </dialog>
   </>;
