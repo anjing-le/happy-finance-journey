@@ -5,6 +5,13 @@ const base = __SITE_BASE__;
 const columns = [{ id: 'knowledge', label: '知识' }, { id: 'practices', label: '最佳实践' }, { id: 'activities', label: '活动' }];
 type Reading = { title: string; html: string; module: string; illustrated?: boolean };
 function Markdown({ html }: { html: string }) { return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />; }
+function TermCopy({ html }: { html: string }) {
+  const list = html.match(/<ol[^>]*>([\s\S]*?)<\/ol>/);
+  const terms = list ? [...list[1].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(match => match[1].replace(/<[^>]*>/g, '').trim()) : [];
+  const [selected, setSelected] = useState(0);
+  if (!terms.length) return <Markdown html={html} />;
+  return <><div className="term-options" role="group" aria-label="选择知识点">{terms.map((term, index) => <button key={term} aria-pressed={selected === index} onClick={() => setSelected(index)}>{term}</button>)}</div><Markdown html={html.replace(list![0], '')} /><p className="term-pending" aria-live="polite">{terms[selected]}：解释待整理。</p></>;
+}
 function ReadingBody({ reading }: { reading: Reading }) {
   const slides = [...reading.html.matchAll(/<img\b[^>]*src="([^"]+)"[^>]*alt="([^"]*)"[^>]*>|<img\b[^>]*alt="([^"]*)"[^>]*src="([^"]+)"[^>]*>/g)].map(match => ({ src: match[1] || match[4], alt: match[2] || match[3] || '' }));
   const [active, setActive] = useState(0);
@@ -17,7 +24,7 @@ function ReadingBody({ reading }: { reading: Reading }) {
     parent.scrollTo({ left: index * parent.clientWidth, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }
   return <div className="reading-layout">
-    <div className="reading-copy"><Markdown html={text} /></div>
+    <div className="reading-copy">{reading.illustrated ? <TermCopy html={text} /> : <Markdown html={text} />}</div>
     <div className="image-carousel" role="region" aria-label="知识配图轮播">
       {!slides.length && <div className="image-empty" aria-label="预留配图区域"><span>配图待补充</span></div>}
       <div className="carousel-track" ref={track} onScroll={() => { const parent = track.current; if (parent) setActive(Math.round(parent.scrollLeft / parent.clientWidth)); }}>

@@ -82,3 +82,9 @@ button:focus-visible,a:focus-visible{outline-color:var(--module-color, #4e6fa7)}
 .image-empty{flex:1;min-height:240px;border:1px dashed var(--module-border);border-radius:14px;display:grid;place-items:center;color:var(--module-color);font-size:13px;background:#ffffff30}
 .image-carousel:has(.image-empty) .carousel-track{display:none}
 @media(max-width:720px){.image-empty{min-height:240px}}
+
+@media(min-width:721px){.reading-layout{grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:28px}}
+.term-options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.term-options button{min-height:44px;padding:8px 12px;border:1px solid var(--module-border);border-radius:9px;background:#ffffff60;color:inherit;font-size:14px;cursor:pointer}
+.term-options button[aria-pressed=true]{background:var(--module-color);border-color:var(--module-color);color:white}
+.term-pending{font-size:14px;line-height:1.8;color:var(--module-color);margin-top:24px}
