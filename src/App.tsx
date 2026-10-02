@@ -20,6 +20,10 @@ function ReadingBody({ reading }: { reading: Reading }) {
   function syncHeading() {
     const parent = copy.current;
     if (!parent) return;
+    if (parent.scrollHeight > parent.clientHeight && parent.scrollTop + parent.clientHeight >= parent.scrollHeight - 2) {
+      setActive(headings.at(-1)!.id);
+      return;
+    }
     const top = parent.getBoundingClientRect().top + 24;
     const visible = [...parent.querySelectorAll('h2[id],h3[id],h4[id],h5[id],h6[id]')].filter(item => item.getBoundingClientRect().top <= top);
     setActive(visible.at(-1)?.id || headings[0].id);
