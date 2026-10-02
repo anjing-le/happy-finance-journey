@@ -3,35 +3,16 @@ import content from './generated/content.json';
 
 const base = __SITE_BASE__;
 const columns = [{ id: 'knowledge', label: '知识' }, { id: 'practices', label: '最佳实践' }, { id: 'activities', label: '活动' }];
-type Reading = { title: string; html: string; module: string; illustrated?: boolean };
+type Reading = { title: string; html: string; module: string; termList?: boolean };
 function Markdown({ html }: { html: string }) { return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />; }
-function TermCopy({ html }: { html: string }) {
-  const list = html.match(/<ol[^>]*>([\s\S]*?)<\/ol>/);
+function ReadingBody({ reading }: { reading: Reading }) {
+  const list = reading.termList ? reading.html.match(/<ol[^>]*>([\s\S]*?)<\/ol>/) : null;
   const terms = list ? [...list[1].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(match => match[1].replace(/<[^>]*>/g, '').trim()) : [];
   const [selected, setSelected] = useState(0);
-  if (!terms.length) return <Markdown html={html} />;
-  return <><div className="term-options" role="group" aria-label="选择知识点">{terms.map((term, index) => <button key={term} aria-pressed={selected === index} onClick={() => setSelected(index)}>{term}</button>)}</div><Markdown html={html.replace(list![0], '')} /><p className="term-pending" aria-live="polite">{terms[selected]}：解释待整理。</p></>;
-}
-function ReadingBody({ reading }: { reading: Reading }) {
-  const slides = [...reading.html.matchAll(/<img\b[^>]*src="([^"]+)"[^>]*alt="([^"]*)"[^>]*>|<img\b[^>]*alt="([^"]*)"[^>]*src="([^"]+)"[^>]*>/g)].map(match => ({ src: match[1] || match[4], alt: match[2] || match[3] || '' }));
-  const [active, setActive] = useState(0);
-  const track = useRef<HTMLDivElement>(null);
-  if (!slides.length && !reading.illustrated) return <Markdown html={reading.html} />;
-  const text = reading.html.replace(/<img\b[^>]*>/g, '').replace(/<p>\s*<\/p>/g, '');
-  function select(index: number) {
-    const parent = track.current;
-    if (!parent) return;
-    parent.scrollTo({ left: index * parent.clientWidth, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-  }
+  if (!terms.length) return <Markdown html={reading.html} />;
   return <div className="reading-layout">
-    <div className="reading-copy">{reading.illustrated ? <TermCopy html={text} /> : <Markdown html={text} />}</div>
-    <div className="image-carousel" role="region" aria-label="知识配图轮播">
-      {!slides.length && <div className="image-empty" aria-label="预留配图区域"><span>配图待补充</span></div>}
-      <div className="carousel-track" ref={track} onScroll={() => { const parent = track.current; if (parent) setActive(Math.round(parent.scrollLeft / parent.clientWidth)); }}>
-        {slides.map((slide, index) => <figure className="carousel-slide" key={slide.src}><img src={slide.src} alt={slide.alt} loading={index === 0 ? 'eager' : 'lazy'} decoding="async" /></figure>)}
-      </div>
-      {slides.length > 1 && <div className="carousel-controls"><button aria-label="上一张配图" disabled={active === 0} onClick={() => select(active - 1)}>‹</button><div className="carousel-dots">{slides.map((slide, index) => <button key={slide.src} aria-label={`第 ${index + 1} 张配图`} aria-current={active === index ? 'true' : undefined} onClick={() => select(index)} />)}</div><span className="carousel-count" aria-live="polite">{active + 1} / {slides.length}</span><button aria-label="下一张配图" disabled={active === slides.length - 1} onClick={() => select(active + 1)}>›</button></div>}
-    </div>
+    <nav className="term-options" aria-label="选择知识点">{terms.map((term, index) => <button key={term} aria-current={selected === index ? 'true' : undefined} onClick={() => setSelected(index)}>{term}</button>)}</nav>
+    <div className="reading-copy"><Markdown html={reading.html.replace(list![0], '')} /><p className="term-pending" aria-live="polite">{terms[selected]}：解释待整理。</p></div>
   </div>;
 }
 function Articles({ module, open }: { module: string; open: (reading: Reading) => void }) {
@@ -75,7 +56,7 @@ function Home() {
     <main className="workspace" aria-label="金融知识与实践">
       <nav className="column-switch" aria-label="切换栏目">{columns.map(column => <button key={column.id} data-column={column.id} onClick={() => jump(column.id)} aria-current={activeColumn === column.id ? 'true' : undefined}>{column.label}</button>)}</nav>
       <div className="board" ref={board} onScroll={syncColumn}>
-        <section id="knowledge" className="column" aria-label="知识"><h2 className="column-label">知识</h2><div className="slots">{content.outline.filter(item => !item.group && !['最终阶段：形成自己的体系', '学习方式'].includes(item.title)).map(item => <button className="block" key={item.id} aria-haspopup="dialog" onClick={() => setReading({ title: item.title, html: item.html, module: 'knowledge', illustrated: item.title === '01｜基础名词' })}>{item.category && <span className="chapter-category">{item.category}</span>}<span className="chapter-title">{item.title}</span></button>)}</div><Articles module="knowledge" open={setReading} /></section>
+        <section id="knowledge" className="column" aria-label="知识"><h2 className="column-label">知识</h2><div className="slots">{content.outline.filter(item => !item.group && !['最终阶段：形成自己的体系', '学习方式'].includes(item.title)).map(item => <button className="block" key={item.id} aria-haspopup="dialog" onClick={() => setReading({ title: item.title, html: item.html, module: 'knowledge', termList: item.title === '01｜基础名词' })}>{item.category && <span className="chapter-category">{item.category}</span>}<span className="chapter-title">{item.title}</span></button>)}</div><Articles module="knowledge" open={setReading} /></section>
         <section id="practices" className="column" aria-label="最佳实践"><h2 className="column-label">最佳实践</h2><Articles module="practices" open={setReading} />{!content.docs.some(doc => doc.module === 'practices' && !doc.file.endsWith('/README.md') && !doc.file.endsWith('/DESIGN.md')) && <p className="empty">尚未收录</p>}</section>
         <section id="activities" className="column" aria-label="活动"><h2 className="column-label">活动</h2><p className="empty">暂缓</p></section>
       </div>
