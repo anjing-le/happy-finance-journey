@@ -3,21 +3,35 @@ import content from './generated/content.json';
 
 const base = __SITE_BASE__;
 const columns = [{ id: 'knowledge', label: '知识' }, { id: 'practices', label: '最佳实践' }, { id: 'activities', label: '活动' }];
-type Reading = { title: string; html: string; module: string; termList?: boolean };
+type Reading = { title: string; html: string; module: string; toc?: { id: string; title: string; level: number }[] };
 function Markdown({ html }: { html: string }) { return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />; }
 function ReadingBody({ reading }: { reading: Reading }) {
-  const list = reading.termList ? reading.html.match(/<ol[^>]*>([\s\S]*?)<\/ol>/) : null;
-  const terms = list ? [...list[1].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(match => match[1].replace(/<[^>]*>/g, '').trim()) : [];
-  const [selected, setSelected] = useState(0);
-  if (!terms.length) return <Markdown html={reading.html} />;
+  const headings = reading.toc || [];
+  const [active, setActive] = useState(headings[0]?.id || '');
+  const copy = useRef<HTMLDivElement>(null);
+  if (!headings.length) return <Markdown html={reading.html} />;
+  function jump(id: string) {
+    const parent = copy.current;
+    const heading = [...(parent?.querySelectorAll('[id]') || [])].find(item => item.id === id);
+    if (!parent || !heading) return;
+    setActive(id);
+    parent.scrollTo({ top: parent.scrollTop + heading.getBoundingClientRect().top - parent.getBoundingClientRect().top - 12, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  }
+  function syncHeading() {
+    const parent = copy.current;
+    if (!parent) return;
+    const top = parent.getBoundingClientRect().top + 24;
+    const visible = [...parent.querySelectorAll('h2[id],h3[id],h4[id],h5[id],h6[id]')].filter(item => item.getBoundingClientRect().top <= top);
+    setActive(visible.at(-1)?.id || headings[0].id);
+  }
   return <div className="reading-layout">
-    <nav className="term-options" aria-label="选择知识点">{terms.map((term, index) => <button key={term} aria-current={selected === index ? 'true' : undefined} onClick={() => setSelected(index)}>{term}</button>)}</nav>
-    <div className="reading-copy"><Markdown html={reading.html.replace(list![0], '')} /><p className="term-pending" aria-live="polite">{terms[selected]}：解释待整理。</p></div>
+    <nav className="article-index" aria-label="文章目录">{headings.map(heading => <a key={heading.id} href={`#${heading.id}`} aria-current={active === heading.id ? 'location' : undefined} onClick={event => { event.preventDefault(); jump(heading.id); }}>{heading.title}</a>)}</nav>
+    <div className="reading-copy" ref={copy} onScroll={syncHeading}><Markdown html={reading.html} /></div>
   </div>;
 }
 function Articles({ module, open }: { module: string; open: (reading: Reading) => void }) {
-  const articles = content.docs.filter(doc => doc.module === module && !doc.file.endsWith('/README.md') && !doc.file.endsWith('/DESIGN.md'));
-  return articles.length ? <ul className="slots">{articles.map(doc => <li key={doc.file}><button className="block" aria-haspopup="dialog" onClick={() => open({ title: doc.title, html: doc.html, module })}>{doc.title}</button></li>)}</ul> : null;
+  const articles = content.docs.filter(doc => doc.module === module && !doc.file.endsWith('/README.md') && !doc.file.endsWith('/DESIGN.md') && !content.outline.some(item => item.articleFile === doc.file));
+  return articles.length ? <ul className="slots">{articles.map(doc => <li key={doc.file}><button className="block" aria-haspopup="dialog" onClick={() => open({ title: doc.title, html: doc.html, module, toc: doc.toc })}>{doc.title}</button></li>)}</ul> : null;
 }
 function Home() {
   const [reading, setReading] = useState<Reading | null>(null);
@@ -56,7 +70,7 @@ function Home() {
     <main className="workspace" aria-label="金融知识与实践">
       <nav className="column-switch" aria-label="切换栏目">{columns.map(column => <button key={column.id} data-column={column.id} onClick={() => jump(column.id)} aria-current={activeColumn === column.id ? 'true' : undefined}>{column.label}</button>)}</nav>
       <div className="board" ref={board} onScroll={syncColumn}>
-        <section id="knowledge" className="column" aria-label="知识"><h2 className="column-label">知识</h2><div className="slots">{content.outline.filter(item => !item.group && !['最终阶段：形成自己的体系', '学习方式'].includes(item.title)).map(item => <button className="block" key={item.id} aria-haspopup="dialog" onClick={() => setReading({ title: item.title, html: item.html, module: 'knowledge', termList: item.title === '01｜基础名词' })}>{item.category && <span className="chapter-category">{item.category}</span>}<span className="chapter-title">{item.title}</span></button>)}</div><Articles module="knowledge" open={setReading} /></section>
+        <section id="knowledge" className="column" aria-label="知识"><h2 className="column-label">知识</h2><div className="slots">{content.outline.filter(item => !item.group && !['最终阶段：形成自己的体系', '学习方式'].includes(item.title)).map(item => <button className="block" key={item.id} aria-haspopup="dialog" onClick={() => setReading({ title: item.title, html: item.html, module: 'knowledge', toc: item.toc })}>{item.category && <span className="chapter-category">{item.category}</span>}<span className="chapter-title">{item.title}</span></button>)}</div><Articles module="knowledge" open={setReading} /></section>
         <section id="practices" className="column" aria-label="最佳实践"><h2 className="column-label">最佳实践</h2><Articles module="practices" open={setReading} />{!content.docs.some(doc => doc.module === 'practices' && !doc.file.endsWith('/README.md') && !doc.file.endsWith('/DESIGN.md')) && <p className="empty">尚未收录</p>}</section>
         <section id="activities" className="column" aria-label="活动"><h2 className="column-label">活动</h2><p className="empty">暂缓</p></section>
       </div>
@@ -69,5 +83,5 @@ function Home() {
 }
 export default function App({ route = '' }: { route?: string }) {
   const doc = content.docs.find(item => item.route === route);
-  return doc ? <main className="reader" data-module={doc.module}><a className="back-link" href={`${base}${doc.module === 'knowledge' || doc.module === 'practices' ? '#' + doc.module : ''}`}>← 返回</a><Markdown html={doc.html} /></main> : <Home />;
+  return doc ? <main className="reader" data-module={doc.module}><a className="back-link" href={`${base}${doc.module === 'knowledge' || doc.module === 'practices' ? '#' + doc.module : ''}`}>← 返回</a><ReadingBody reading={{ title: doc.title, html: doc.html, module: doc.module, toc: doc.toc }} /></main> : <Home />;
 }

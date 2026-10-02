@@ -3,8 +3,12 @@ import path from 'node:path';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
 
+const headingCounts = new Map();
 marked.use({ renderer: { heading({ tokens, depth, text }) {
-  const id = text.toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, '').trim().replace(/\s/g, '-');
+  const slug = text.toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, '').trim().replace(/\s/g, '-') || 'section';
+  const count = headingCounts.get(slug) || 0;
+  headingCounts.set(slug, count + 1);
+  const id = count ? `${slug}-${count}` : slug;
   return `<h${depth} id="${id}">${this.parser.parseInline(tokens)}</h${depth}>`;
 } } });
 const base = process.env.BASE_PATH || '/';
@@ -25,6 +29,7 @@ const route = file => file === 'README.md' ? 'about.html' : file.endsWith('/READ
 const routes = new Map(pages.map(file => [file, route(file)]));
 const moduleAnchors = { 'knowledge/README.md': 'knowledge', 'practices/README.md': 'practices', 'activities/README.md': 'activities' };
 function html(markdown, source) {
+  headingCounts.clear();
   const tokens = marked.lexer(markdown);
   marked.walkTokens(tokens, token => {
     if (token.type !== 'link' && token.type !== 'image') return;
@@ -45,10 +50,12 @@ function html(markdown, source) {
   });
 }
 const docs = [];
+const toc = output => [...output.matchAll(/<h([2-6]) id="([^"]+)">([\s\S]*?)<\/h\1>/g)].map(match => ({ id: match[2], title: match[3].replace(/<[^>]*>/g, ''), level: Number(match[1]) }));
 for (const file of pages) {
   const md = await readFile(file, 'utf8');
   const title = md.match(/^# (.+)$/m)?.[1] || '目标与维护规则';
-  docs.push({ file, route: routes.get(file), title, html: html(md, file), module: file.split('/')[0] });
+  const output = html(md, file);
+  docs.push({ file, route: routes.get(file), title, html: output, toc: toc(output), module: file.split('/')[0] });
 }
 const knowledge = await readFile('knowledge/README.md', 'utf8');
 const chunks = knowledge.split(/(?=^#{2,3} )/m).slice(1);
@@ -57,7 +64,12 @@ const outline = chunks.filter(chunk => !chunk.startsWith('## 已整理条目')).
   const [, heading, title] = chunk.match(/^(#{2,3}) (.+)\n/);
   const group = heading === '##' && title.startsWith('主线');
   if (heading === '##') category = group ? title.replace(/^主线[^：]*：/, '') : '';
-  return { id: `chapter-${index}`, title, group, category: heading === '###' ? category : '', html: html(chunk.replace(/^#{2,3} .+\n/, ''), 'knowledge/README.md') };
+  const articleLink = chunk.match(/\[阅读全文\]\(([^)#]+\.md)\)/)?.[1];
+  const articleFile = articleLink ? path.posix.normalize(path.posix.join('knowledge', articleLink)) : '';
+  const article = articleFile ? docs.find(doc => doc.file === articleFile) : undefined;
+  if (articleFile && !article) throw new Error(`Missing chapter article: ${articleFile}`);
+  const output = article?.html || html(chunk.replace(/^#{2,3} .+\n/, ''), 'knowledge/README.md');
+  return { id: `chapter-${index}`, title, group, category: heading === '###' ? category : '', articleFile, html: output, toc: article?.toc || [] };
 });
 await rm('public/content', { recursive: true, force: true });
 for (const image of images) {
