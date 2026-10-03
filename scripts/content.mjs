@@ -11,6 +11,9 @@ marked.use({ renderer: { heading({ tokens, depth, text }) {
   headingCounts.set(slug, count + 1);
   const id = count ? `${slug}-${count}` : slug;
   return `<h${depth} id="${id}">${this.parser.parseInline(tokens)}</h${depth}>`;
+}, blockquote({ tokens, text }) {
+  if (text.trim() === '配图预留') return '<div class="illustration-placeholder" aria-label="配图预留"><span>配图预留</span></div>';
+  return `<blockquote>${this.parser.parse(tokens)}</blockquote>`;
 } } });
 const base = process.env.BASE_PATH || '/';
 const modules = ['knowledge', 'practices', 'activities'];
@@ -57,7 +60,8 @@ function html(markdown, source) {
   const output = marked.parser(tokens);
   return sanitizeHtml(output, {
     allowedTags: [...sanitizeHtml.defaults.allowedTags, 'img'],
-    allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, img: ['src', 'alt', 'width', 'height', 'loading', 'decoding'], h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'] },
+    allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, div: ['class', 'aria-label'], img: ['src', 'alt', 'width', 'height', 'loading', 'decoding'], h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'] },
+    allowedClasses: { div: ['illustration-placeholder'] },
     transformTags: { img: (tagName, attribs) => ({ tagName, attribs: { ...attribs, ...imageSizes.get(attribs.src), loading: 'lazy', decoding: 'async' } }) },
   });
 }

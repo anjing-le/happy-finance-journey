@@ -63,6 +63,8 @@ button:focus-visible,a:focus-visible{outline-color:var(--module-color, #4e6fa7)}
 :is(.reading-copy,.article-index)::-webkit-scrollbar{display:none}
 .reading-copy:focus-visible{outline:2px solid var(--module-border);outline-offset:3px;border-radius:4px}
 .reading-copy .prose{width:100%;max-width:none;margin:0}
+.illustration-placeholder{display:grid;place-items:center;min-height:clamp(96px,10vw,128px);margin:20px 0 32px;border:1px dashed var(--module-border,#dce5f5);border-radius:14px;background:#ffffff30;color:var(--module-color,#4e6fa7);font-size:12px;letter-spacing:.06em}
+.illustration-placeholder span{opacity:.65}
 .reader:has(.reading-layout){max-width:1180px}.reader .reading-layout{height:calc(100dvh - 160px)}
 @media(max-width:720px){
  .detail-scroll:has(.reading-layout){padding:8px 16px 24px}
