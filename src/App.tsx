@@ -4,7 +4,31 @@ import content from './generated/content.json';
 const base = __SITE_BASE__;
 const columns = [{ id: 'knowledge', label: '知识' }, { id: 'practices', label: '最佳实践' }, { id: 'activities', label: '活动' }];
 type Reading = { title: string; html: string; module: string; toc?: { id: string; title: string; level: number }[] };
-function Markdown({ html }: { html: string }) { return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />; }
+function Markdown({ html }: { html: string }) {
+  const [image, setImage] = useState<{ src: string; alt: string } | null>(null);
+  const [zoomed, setZoomed] = useState(false);
+  const viewer = useRef<HTMLDialogElement>(null);
+  // The HTML is already sanitized at build time. Existing image links retain their destination.
+  const body = html.replace(/<a\b[^>]*>[\s\S]*?<\/a>|<img\b[^>]*>/g, tag => {
+    if (!tag.startsWith('<img')) return tag;
+    const alt = /alt="([^"]*)"/.exec(tag)?.[1] || '文章配图';
+    return `<button type="button" class="article-image" aria-haspopup="dialog" aria-label="放大图片：${alt}">${tag}</button>`;
+  });
+  useEffect(() => { if (image) viewer.current?.showModal(); }, [image]);
+  return <>
+    <div className="prose" dangerouslySetInnerHTML={{ __html: body }} onClick={event => {
+      const button = (event.target as Element).closest('button.article-image');
+      const selected = button?.querySelector('img');
+      if (!selected) return;
+      setZoomed(false);
+      setImage({ src: selected.currentSrc || selected.src, alt: selected.alt });
+    }} />
+    <dialog className="image-viewer" ref={viewer} aria-label="图片预览" data-zoomed={zoomed} onClose={event => { event.stopPropagation(); setImage(null); }} onClick={event => { if (event.target === event.currentTarget) viewer.current?.close(); }}>
+      <div className="image-viewer-top"><span className="image-viewer-hint">{zoomed ? '滑动查看 · 点击缩小' : '点击图片放大'}</span><button type="button" className="close-detail" aria-label="关闭图片" onClick={() => viewer.current?.close()}>×</button></div>
+      <div className="image-stage"><button type="button" className="image-zoom" aria-label={zoomed ? '缩小图片' : '放大至原图，滑动或滚动查看'} aria-pressed={zoomed} onClick={() => setZoomed(value => !value)}>{image && <img src={image.src} alt={image.alt} />}</button></div>
+    </dialog>
+  </>;
+}
 function ReadingBody({ reading }: { reading: Reading }) {
   const headings = reading.toc || [];
   const [active, setActive] = useState(headings[0]?.id || '');
