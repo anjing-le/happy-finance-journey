@@ -20,11 +20,30 @@ const modules = ['knowledge', 'practices', 'activities'];
 const pages = [];
 const images = new Set();
 const imageSizes = new Map();
-function pngSize(file) {
+function imageSize(file) {
   const buffer = readFileSync(file);
-  if (buffer.length < 24 || !buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return {};
-  const width = buffer.readUInt32BE(16), height = buffer.readUInt32BE(20);
-  return width && height ? { width: String(width), height: String(height) } : {};
+  const dimensions = (width, height) => width && height ? { width: String(width), height: String(height) } : {};
+  if (buffer.length >= 24 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
+    return dimensions(buffer.readUInt32BE(16), buffer.readUInt32BE(20));
+  }
+  if (buffer.length < 12 || buffer.toString('ascii', 0, 4) !== 'RIFF' || buffer.toString('ascii', 8, 12) !== 'WEBP') return {};
+  const end = Math.min(buffer.length, buffer.readUInt32LE(4) + 8);
+  for (let offset = 12; offset + 8 <= end;) {
+    const kind = buffer.toString('ascii', offset, offset + 4);
+    const length = buffer.readUInt32LE(offset + 4);
+    const start = offset + 8;
+    if (start + length > end) return {};
+    if (kind === 'VP8X' && length >= 10) return dimensions(buffer.readUIntLE(start + 4, 3) + 1, buffer.readUIntLE(start + 7, 3) + 1);
+    if (kind === 'VP8L' && length >= 5 && buffer[start] === 0x2f) {
+      const bits = buffer.readUInt32LE(start + 1);
+      return dimensions((bits & 0x3fff) + 1, ((bits >>> 14) & 0x3fff) + 1);
+    }
+    if (kind === 'VP8 ' && length >= 10 && buffer.subarray(start + 3, start + 6).equals(Buffer.from([0x9d, 0x01, 0x2a]))) {
+      return dimensions(buffer.readUInt16LE(start + 6) & 0x3fff, buffer.readUInt16LE(start + 8) & 0x3fff);
+    }
+    offset = start + length + (length % 2);
+  }
+  return {};
 }
 async function collect(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
@@ -51,7 +70,7 @@ function html(markdown, source) {
     if (token.type === 'image') {
       images.add(resolved);
       token.href = `${base}content/${resolved}`;
-      if (!imageSizes.has(token.href)) imageSizes.set(token.href, pngSize(resolved));
+      if (!imageSizes.has(token.href)) imageSizes.set(token.href, imageSize(resolved));
     }
     else if (moduleAnchors[resolved] && !hash) token.href = `${base}#${moduleAnchors[resolved]}`;
     else if (routes.has(resolved)) token.href = `${base}${routes.get(resolved)}${hash ? '#' + hash : ''}`;
