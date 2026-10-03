@@ -57,8 +57,11 @@ button:focus-visible,a:focus-visible{outline-color:var(--module-color, #4e6fa7)}
 .article-index{display:flex;flex-direction:column;gap:2px;overflow-y:auto;min-height:0;padding:0 8px 0 0}
 .article-index a{display:block;flex:0 0 auto;min-height:36px;text-align:left;padding:6px 10px;border:0;border-radius:6px;background:transparent;color:inherit;font-size:14px;cursor:pointer}
 .article-index a:hover{background:#ffffff60}
-.article-index a[aria-current=location]{background:#ffffff90;color:var(--module-color);font-weight:600}
+.article-index a[aria-current=location]{background:linear-gradient(90deg,var(--module-border) var(--reading-progress,0%),#ffffff90 var(--reading-progress,0%));color:var(--module-color);font-weight:600}
 .reading-copy{min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:8px 8px 16px 0}
+.reading-copy,.article-index{scrollbar-width:none}
+:is(.reading-copy,.article-index)::-webkit-scrollbar{display:none}
+.reading-copy:focus-visible{outline:2px solid var(--module-border);outline-offset:3px;border-radius:4px}
 .reading-copy .prose{width:100%;max-width:none;margin:0}
 .reader:has(.reading-layout){max-width:1180px}.reader .reading-layout{height:calc(100dvh - 160px)}
 @media(max-width:720px){
@@ -88,12 +91,12 @@ button:focus-visible,a:focus-visible{outline-color:var(--module-color, #4e6fa7)}
  .image-zoom img{max-height:calc(100dvh - 104px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
 }
 
-/* Reading scrollbars stay small and blend into the module surface. */
-:is(.reading-copy,.article-index,.detail-scroll,.image-stage)::-webkit-scrollbar{width:6px;height:6px}
-:is(.reading-copy,.article-index,.detail-scroll,.image-stage)::-webkit-scrollbar-track{background:transparent}
-:is(.reading-copy,.article-index,.detail-scroll,.image-stage)::-webkit-scrollbar-thumb{background:#8f9db566;border-radius:999px}
-:is(.reading-copy,.article-index,.detail-scroll,.image-stage)::-webkit-scrollbar-thumb:hover{background:#8f9db5a6}
-:is(.reading-copy,.article-index,.detail-scroll,.image-stage)::-webkit-scrollbar-corner{background:transparent}
+/* The article index shows reading position; image panning keeps a small scrollbar. */
+:is(.detail-scroll,.image-stage)::-webkit-scrollbar{width:6px;height:6px}
+:is(.detail-scroll,.image-stage)::-webkit-scrollbar-track{background:transparent}
+:is(.detail-scroll,.image-stage)::-webkit-scrollbar-thumb{background:#8f9db566;border-radius:999px}
+:is(.detail-scroll,.image-stage)::-webkit-scrollbar-thumb:hover{background:#8f9db5a6}
+:is(.detail-scroll,.image-stage)::-webkit-scrollbar-corner{background:transparent}
 @supports not selector(::-webkit-scrollbar){
- :is(.reading-copy,.article-index,.detail-scroll,.image-stage){scrollbar-width:thin;scrollbar-color:#8f9db566 transparent}
+ :is(.detail-scroll,.image-stage){scrollbar-width:thin;scrollbar-color:#8f9db566 transparent}
 }

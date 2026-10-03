@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import content from './generated/content.json';
 
 const base = __SITE_BASE__;
@@ -31,30 +31,67 @@ function Markdown({ html }: { html: string }) {
 }
 function ReadingBody({ reading }: { reading: Reading }) {
   const headings = reading.toc || [];
-  const [active, setActive] = useState(headings[0]?.id || '');
+  const [position, setPosition] = useState({ id: headings[0]?.id || '', progress: 0 });
   const copy = useRef<HTMLDivElement>(null);
-  if (!headings.length) return <Markdown html={reading.html} />;
+  const endTarget = useRef<string | null>(null);
+  useEffect(() => {
+    const parent = copy.current;
+    if (!parent) return;
+    let frame = 0;
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(() => { frame = 0; syncReading(); });
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(parent);
+    const prose = parent.querySelector('.prose');
+    if (prose) observer.observe(prose);
+    parent.addEventListener('scroll', schedule, { passive: true });
+    parent.addEventListener('load', schedule, true);
+    schedule();
+    return () => {
+      observer.disconnect();
+      parent.removeEventListener('scroll', schedule);
+      parent.removeEventListener('load', schedule, true);
+      cancelAnimationFrame(frame);
+    };
+  }, [reading.html, reading.toc]);
   function jump(id: string) {
     const parent = copy.current;
     const heading = [...(parent?.querySelectorAll('[id]') || [])].find(item => item.id === id);
     if (!parent || !heading) return;
-    setActive(id);
-    parent.scrollTo({ top: parent.scrollTop + heading.getBoundingClientRect().top - parent.getBoundingClientRect().top - 12, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    const top = parent.scrollTop + heading.getBoundingClientRect().top - parent.getBoundingClientRect().top - 24;
+    // A short section near the end may not reach the top. Keep its clicked label selected.
+    endTarget.current = top >= parent.scrollHeight - parent.clientHeight - 1 ? id : null;
+    setPosition({ id, progress: 0 });
+    parent.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    if (endTarget.current && parent.scrollTop + parent.clientHeight >= parent.scrollHeight - 2) syncReading();
   }
-  function syncHeading() {
+  function syncReading() {
     const parent = copy.current;
-    if (!parent) return;
-    if (parent.scrollHeight > parent.clientHeight && parent.scrollTop + parent.clientHeight >= parent.scrollHeight - 2) {
-      setActive(headings.at(-1)!.id);
-      return;
-    }
-    const top = parent.getBoundingClientRect().top + 24;
-    const visible = [...parent.querySelectorAll('h2[id],h3[id],h4[id],h5[id],h6[id]')].filter(item => item.getBoundingClientRect().top <= top);
-    setActive(visible.at(-1)?.id || headings[0].id);
+    if (!parent || !headings.length) return;
+    const parentTop = parent.getBoundingClientRect().top;
+    const sections = [...parent.querySelectorAll('h2[id],h3[id],h4[id],h5[id],h6[id]')]
+      .filter(item => headings.some(heading => heading.id === item.id))
+      .map(item => ({ id: item.id, top: parent.scrollTop + item.getBoundingClientRect().top - parentTop }));
+    if (!sections.length) return;
+    const line = parent.scrollTop + 24;
+    const atEnd = parent.scrollHeight > parent.clientHeight && parent.scrollTop + parent.clientHeight >= parent.scrollHeight - 2;
+    let index = 0;
+    sections.forEach((section, sectionIndex) => { if (section.top <= line + 1) index = sectionIndex; });
+    if (atEnd) index = Math.max(0, endTarget.current ? sections.findIndex(section => section.id === endTarget.current) : sections.length - 1);
+    const start = sections[index].top;
+    const end = sections[index + 1]?.top ?? parent.scrollHeight;
+    const progress = atEnd ? 100 : Math.round(Math.max(0, Math.min(1, (line - start) / Math.max(1, end - start))) * 100);
+    const id = sections[index].id;
+    setPosition(previous => previous.id === id && previous.progress === progress ? previous : { id, progress });
   }
+  function resumeReading() {
+    if (endTarget.current) { endTarget.current = null; syncReading(); }
+  }
+  if (!headings.length) return <Markdown html={reading.html} />;
   return <div className="reading-layout">
-    <nav className="article-index" aria-label="文章目录">{headings.map(heading => <a key={heading.id} href={`#${heading.id}`} aria-current={active === heading.id ? 'location' : undefined} onClick={event => { event.preventDefault(); jump(heading.id); }}>{heading.title}</a>)}</nav>
-    <div className="reading-copy" ref={copy} onScroll={syncHeading}><Markdown html={reading.html} /></div>
+    <nav className="article-index" aria-label="文章目录">{headings.map(heading => <a key={heading.id} href={`#${heading.id}`} aria-current={position.id === heading.id ? 'location' : undefined} style={position.id === heading.id ? { '--reading-progress': `${position.progress}%` } as CSSProperties : undefined} onClick={event => { event.preventDefault(); jump(heading.id); }}>{heading.title}</a>)}</nav>
+    <div className="reading-copy" ref={copy} tabIndex={0} role="region" aria-label="文章正文" onWheel={resumeReading} onTouchStart={resumeReading} onKeyDown={event => { if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) resumeReading(); }}><Markdown html={reading.html} /></div>
   </div>;
 }
 function Articles({ module, open }: { module: string; open: (reading: Reading) => void }) {
