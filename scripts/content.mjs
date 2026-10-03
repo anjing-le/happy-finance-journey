@@ -1,4 +1,5 @@
 import { readFile, readdir, mkdir, writeFile, copyFile, rm } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
@@ -15,6 +16,13 @@ const base = process.env.BASE_PATH || '/';
 const modules = ['knowledge', 'practices', 'activities'];
 const pages = [];
 const images = new Set();
+const imageSizes = new Map();
+function pngSize(file) {
+  const buffer = readFileSync(file);
+  if (buffer.length < 24 || !buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return {};
+  const width = buffer.readUInt32BE(16), height = buffer.readUInt32BE(20);
+  return width && height ? { width: String(width), height: String(height) } : {};
+}
 async function collect(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const file = path.posix.join(dir, entry.name);
@@ -37,7 +45,11 @@ function html(markdown, source) {
     const [file, hash] = token.href.split('#');
     const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(source), file));
     if (resolved.startsWith('../') || path.posix.isAbsolute(resolved)) throw new Error(`Asset outside repository: ${source}`);
-    if (token.type === 'image') { images.add(resolved); token.href = `${base}content/${resolved}`; }
+    if (token.type === 'image') {
+      images.add(resolved);
+      token.href = `${base}content/${resolved}`;
+      if (!imageSizes.has(token.href)) imageSizes.set(token.href, pngSize(resolved));
+    }
     else if (moduleAnchors[resolved] && !hash) token.href = `${base}#${moduleAnchors[resolved]}`;
     else if (routes.has(resolved)) token.href = `${base}${routes.get(resolved)}${hash ? '#' + hash : ''}`;
     else throw new Error(`Unresolved link: ${source} → ${token.href}`);
@@ -46,7 +58,7 @@ function html(markdown, source) {
   return sanitizeHtml(output, {
     allowedTags: [...sanitizeHtml.defaults.allowedTags, 'img'],
     allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, img: ['src', 'alt', 'width', 'height', 'loading', 'decoding'], h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'] },
-    transformTags: { img: (tagName, attribs) => ({ tagName, attribs: { ...attribs, loading: 'lazy', decoding: 'async' } }) },
+    transformTags: { img: (tagName, attribs) => ({ tagName, attribs: { ...attribs, ...imageSizes.get(attribs.src), loading: 'lazy', decoding: 'async' } }) },
   });
 }
 const docs = [];
