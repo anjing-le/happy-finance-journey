@@ -53,7 +53,7 @@ async function collect(dir) {
   }
 }
 for (const dir of modules) await collect(dir);
-pages.push('README.md');
+pages.push('README.md', 'README.zh-CN.md');
 pages.sort();
 const route = file => file === 'README.md' ? 'about.html' : file.endsWith('/README.md') ? `read/${file.slice(0, -10)}/index.html` : `read/${file.slice(0, -3)}.html`;
 const routes = new Map(pages.map(file => [file, route(file)]));

@@ -1,53 +1,59 @@
-![Happy Finance Journey：知识、最佳实践、活动；一起学，一起做，不断变好](assets/journey-poster.png)
+**English** | [简体中文](README.zh-CN.md)
 
-- [知识](knowledge/README.md)：理解金融概念、机制与它们的适用范围。
-- [最佳实践](practices/README.md)：整理有依据、能复查的研究与判断方法。
-- [活动](activities/README.md)：从具体问题出发，学习、实践、验证并复盘。
+![Happy Finance Journey: Knowledge, Best Practices, Activities; Learn. Build. Grow. Together.](assets/journey-poster.en.png)
 
-[进入网站](https://happy-finance.anjing.cc) · [GitHub Pages 备用入口](https://anjing-le.github.io/happy-finance-journey/overview.html)
+- [Knowledge](knowledge/README.md): Understand financial concepts, mechanisms and their scope.
+- [Best Practices](practices/README.md): Develop evidence-based research and decision methods that can be reviewed.
+- [Activities](activities/README.md): Learn, practice, verify and reflect through concrete questions.
 
-## 目标
+[Visit the website](https://happy-finance.anjing.cc) · [GitHub Pages fallback](https://anjing-le.github.io/happy-finance-journey/overview.html)
 
-Happy Finance Journey 是我对金融领域的长期学习与实践记录，以股票投资与交易为最终实践方向。希望把值得理解的问题、亲自检验的方法和可参与的活动逐步整理出来，让读者能直接阅读、查证和实践，不需要先熟悉仓库结构，也不需要使用特定 AI 工具。
+Linked learning articles and the website currently remain primarily in Chinese. A bilingual README does not imply that every lesson or illustration has been translated.
 
-当前先积累知识与最佳实践，活动暂缓。学习范围沿用已收录的两条主线与 12 个章节，新增主题按实际需要确定；不把未经验证的观点写成结论。
+<a id="目标"></a>
+## Goal
 
-## 维护规则
+Happy Finance Journey records my long-term financial learning and practice, with stock investing and trading as the eventual practical direction. It gradually organizes worthwhile questions, personally tested methods and participatory activities so readers can read, check and practice without first learning the repository structure or using a particular AI tool.
 
-- **开始维护**：先读本页和目标模块 README；设计活动时再读[共同原则](activities/DESIGN.md)。仓库文件是接续工作的依据。
-- **内容组织**：一份内容维护一份 Markdown，用相对链接串联。三个模块先平铺；有足够内容和明确用途时再细分。
-- **原创写作**：正文由我们自行撰写，不设置外部引用、转载或原文入口；已有标题作为待打磨目录维护。
-- **准确性与时效**：涉及事实、数据、市场、政策或规则时核实对应时间、地区与适用条件。区分已确认事实、推测、个人观点和待验证问题。
-- **最佳实践**：写清解决的问题、做法、适用条件、验证依据与限制。个人经验不直接升格为普遍结论；草稿不标成已验证。
-- **活动**：围绕具体问题设置目标、过程和可检查的成果。活动中按需关联知识和最佳实践，不重复维护正文。
-- **公开边界**：不公开私人账户、交易记录、凭据或未经授权的材料；案例使用的数据须可核实，示例与真实记录分开。
-- **迭代发布**：提出问题 → 查证与实践 → 记录结果 → 复盘修订。修改 Markdown 后检查链接，运行 `npm run build`，再同步发布；网页由内容源构建，不另行维护正文。
+Current work focuses on knowledge and practices; activities are paused. The learning scope retains the existing two tracks and twelve chapters. Add topics when needed, and do not present unverified views as conclusions.
 
-## 待办
+## Maintenance rules
 
-框架已建立，[知识学习脉络](knowledge/README.md)的 12 个章节均已有图文学习初稿；内容仍需逐点学习和反馈校准，具体方法尚未实盘验证。当前先积累知识与最佳实践，活动暂缓。
+- **Getting started**: Read this page and the target module README; for activities, read the [shared principles](activities/DESIGN.md). Repository files support continuity.
+- **Organization**: One Markdown source per item, connected with relative links. Keep the three modules flat initially; subdivide when sufficient content and a clear use justify it.
+- **Original writing**: Write our own articles, without external-reference, repost or original-source entry sections in the website body. Existing titles form a refinement backlog.
+- **Accuracy and timeliness**: Verify the relevant date, region and conditions for facts, data, markets, policies and rules. Separate confirmed facts, inferences, personal opinions and open questions.
+- **Best practices**: Explain the problem, method, applicable conditions, evidence and limits. Personal experience is not automatically a general rule; drafts are not verified practices.
+- **Activities**: Set goals, process and checkable outputs around a concrete question. Link knowledge and practices rather than duplicating them.
+- **Public boundaries**: Do not publish private accounts, trade records, credentials or unauthorized material. Use verifiable case data and distinguish examples from actual records.
+- **Iteration**: Question → research and practice → record results → review and revise. After Markdown edits, check links, run `npm run build`, then publish. The website is built from source content; do not separately maintain its body.
 
-- [x] 按原范围完成 12 个章节的文字初稿。
-- [x] 保留第一篇 13 张图片，为 02–12 的 104 个知识点配齐图片。
-- [ ] 从「02｜K 线与市场结构」开始，逐个知识点共同学习、修订讲解。
-- [ ] 学习中同步修订文字、图片和「安静的finance」Skill，积累能帮助理解的反馈。
-- [ ] 选第一个真实金融问题，确定所需知识与验证方式。
-- [ ] 从亲自实践过的方法中选一项，写出依据、适用条件和限制。
-- [ ] 活动暂缓；恢复时为第一个活动确定目标、参与基础和可检查的成果。
+<a id="待办"></a>
+## Backlog
 
-## 前端工程
+The framework exists. All twelve chapters in the [learning outline](knowledge/README.md) have illustrated learning drafts. Their explanations still need item-by-item learning and feedback; specific methods have not been validated through live trading. Knowledge and practices remain the focus; activities are paused.
 
-内容和呈现分别维护在同一个仓库：
+- [x] Complete text drafts for the existing twelve chapters.
+- [x] Retain Chapter 1's thirteen images and add illustrations for the 104 knowledge points in Chapters 2–12.
+- [ ] Starting with Chapter 2, Candlesticks and Market Structure, learn each point together and revise explanations.
+- [ ] Update text, images and the Anjing finance Skill from learning feedback.
+- [ ] Choose the first real financial question, necessary knowledge and verification method.
+- [ ] Select one personally tried method and document evidence, conditions and limits.
+- [ ] Keep activities paused; when resumed, define the first activity's goals, prerequisites and checkable outputs.
 
-- `knowledge/`、`practices/`、`activities/`：Markdown 内容，继续作为唯一正文来源。
-- `src/`：React + TypeScript 页面组件与样式。
-- `scripts/content.mjs`：读取 Markdown、生成章节和文章数据，检查本地文档链接并清理 HTML。
-- `scripts/prerender.mjs`：预渲染完整 HTML 到 `dist/`；客户端接管阅读浮窗与手机栏目切换。
-- `assets/`：原始公共素材；构建时复制到网站。
+## Frontend
 
-### 本地开发
+Content and presentation live separately within the same repository:
 
-需要 Node.js 22.12+。
+- `knowledge/`, `practices/`, `activities/`: Markdown, the sole article sources.
+- `src/`: React and TypeScript components and styles.
+- `scripts/content.mjs`: Reads Markdown, generates chapter/article data, checks local document links and sanitizes HTML.
+- `scripts/prerender.mjs`: Prerenders full HTML into `dist/`; the client handles reading dialogs and mobile tabs.
+- `assets/`: Original public assets, copied to the website during builds.
+
+### Local development
+
+Requires Node.js 22.12+.
 
 ```sh
 npm ci
@@ -56,32 +62,31 @@ npm run build
 npm run preview
 ```
 
-开发服务器更新 Markdown 后运行 `npm run content` 即可刷新内容。生成数据和构建产物不提交。新增知识或实践文章时，直接在对应目录添加 Markdown；网站自动列出文章，章节关联继续在模块 README 中添加链接。不需要手改 HTML 或 JSON。
+After Markdown changes in development, run `npm run content` to refresh content. Do not commit generated data or build output. Add knowledge and practice articles as Markdown in their existing directories; the website lists them automatically. Continue linking chapters in module READMEs. Do not hand-edit HTML or JSON.
 
-### 发布
+### Publishing
 
-- Cloudflare Pages 项目：`happy-finance-journey`，域名：`happy-finance.anjing.cc`。
-- 构建命令：`npm run build`；输出目录：`dist`；Node.js：22。
-- GitHub `main` 更新触发 Cloudflare 构建；部署钩子由仓库 secret `CF_PAGES_DEPLOY_HOOK` 保存。
-- GitHub Pages 由 Actions 构建，使用 `BASE_PATH=/happy-finance-journey/`。
-- `overview.html` 由同一前端工程生成，兼容旧收藏地址。
+- Cloudflare Pages project: `happy-finance-journey`; domain: `happy-finance.anjing.cc`.
+- Build command: `npm run build`; output: `dist`; Node.js: 22.
+- Updates to GitHub `main` trigger Cloudflare builds; the deployment hook is stored in repository secret `CF_PAGES_DEPLOY_HOOK`.
+- GitHub Pages builds through Actions using `BASE_PATH=/happy-finance-journey/`.
+- The same frontend generates `overview.html` for old bookmarks.
 
-继续迭代：先维护工程与框架，再逐篇打磨内容，最后根据真实使用反馈改进。
+Continue by maintaining the engineering and framework, refining articles individually, then improving from real usage feedback.
 
-呈现采用左、中、右三列：知识、最佳实践、活动。首页不展示品牌大标题、海报或宣传文案；知识主线作为每个章节标题左侧的标签，章节保持同层卡片，点击后用阅读浮窗展示。手机端每屏完整显示一个栏目，横向滑动或点击顶部栏目切换；顶部切换保持可见，点击切换不带动页面纵向滚动。首页和阅读浮窗为 iPhone 安全区预留空间。
+The site uses three columns: Knowledge, Best Practices and Activities. Its homepage omits a large brand title, poster and promotional copy. Knowledge-track tags appear beside chapter titles; chapters remain peer-level cards opening reading dialogs. Mobile shows one full column at a time, switched by horizontal swipe or top tabs. Tabs stay visible without scrolling the page when clicked. Homepage and dialogs reserve iPhone safe-area space.
 
+### Engineering checks before content iteration
 
-### 内容迭代前的工程检查
+- Cards and dialogs share module colors: knowledge blue, practices green, activities orange. Dialogs omit a duplicate title bar, preserve Markdown titles and use dark body text for readability.
+- Mobile columns support deep links and restoration on back navigation. Newly opened content starts at the top; close buttons and Esc are supported.
+- Parse, sanitize and prerender article bodies at build time, without a browser Markdown parser. Lazy-load article images; embed real PNG/WebP dimensions during builds to reserve space and avoid shifting anchor targets. New knowledge images use lossless WebP; preserve original generated drafts.
+- Keep flat Markdown and automatic publishing for now. Evaluate search, pagination and lazy article loading when content grows; do not preemptively add directory layers.
 
-- 卡片与阅读浮窗共用模块配色：知识蓝、最佳实践绿、活动橙；浮窗不设置重复的标题栏，保留 Markdown 自身的文章标题与章节标题；正文保持深色便于阅读。
-- 手机栏目支持链接定位与返回恢复；新打开的阅读内容从顶部开始，支持关闭按钮和 Esc。
-- 正文在构建阶段解析、清理并预渲染，浏览器不加载 Markdown 解析器；正文图片延迟加载，本地 PNG 与 WebP 在构建时写入实际宽高，提前预留空间，避免加载图片后改变目录跳转位置。新增知识图采用无损 WebP，保留原始生成稿。
-- 当前先沿用平铺 Markdown 和自动发布。内容明显增长后再评估搜索、分页和正文按需加载，不预先增加目录层级。
+The twelve knowledge chapters contain 117 illustrated learning-draft sections, explaining one point at a time with short statements of meaning, use and necessary limits. Chapter 1, Basic Terms, retains its thirteen illustrated sections; the stock example was approved. The 104 points in Chapters 2–12 have landscape images under the user's latest authorization. Image regions correspond to identically named text items in the same order, using a white background, Anjing IP and crayon style. Next, learn point by point and revise articles, images and the finance Skill from feedback. A draft is not evidence of mastery, approval of every item or live-trading validation. Best Practices retains thirteen existing titles for gradual writing; activities remain paused.
 
-知识的 12 个章节已有 117 节图文学习初稿，一次讲清一个知识点，用短条目说明含义、用途和必要边界。「01｜基础名词」保留已有 13 节图文，股票样稿已认可；按用户最新授权，为 02–12 的 104 个知识点配齐横图。图中各区对应同名、同序的文字条目，沿用白底、安静 IP 和蜡笔画风。接下来逐点共同学习，有反馈就同步修订正文、配图和「安静的finance」Skill；初稿不等于已掌握、逐点获认可或经过实盘验证。最佳实践保留现有 13 个标题，正文逐项整理；活动继续暂缓。
+Articles use a narrow table of contents beside complete Markdown. The first source is `knowledge/basic-terms.md`, with thirteen terms as peer `##` headings. Generate navigation from article headings; selecting an entry scrolls only the article, while manual scrolling updates the current entry without hiding other sections. Dialogs and standalone article URLs share the component. On desktop, text and images fill the available right-side width. Hide article scrollbars; a rounded, lightly colored current-entry background fills left to right to show section position, using the module color. Support natural scrolling plus arrow keys, PageUp/PageDown and Home/End when focused. Recalculate positions after images load or the window changes size.
 
-文章阅读采用窄目录＋完整 Markdown 正文。第一篇内容源为 `knowledge/basic-terms.md`，13 个名词用同级 `##` 标题组织。目录由正文标题自动生成，点击目录只滚动右侧文章，手动滚动同步当前位置，不切换或隐藏其他段落；浮窗和文章独立网址共用这个组件。桌面正文与图片使用右侧全部可用宽度；正文隐藏滚动条，当前目录项的圆角浅色背景从左向右填充，表示本节的位置，配色沿用对应模块。正文保留自然滚动，也可聚焦后使用方向键、PageUp / PageDown、Home / End。图片加载或窗口尺寸变化后自动重算位置。
+Chapter READMEs link to standalone articles through “Read full article”; homepage chapter cards open the article directly rather than duplicating cards. Edit only Markdown bodies; navigation updates automatically. Insert relative-path images and display them in full. Copy Markdown to migrate text; when local images are included, carry them along and preserve relative paths. Basic Terms orders stocks, share price, shares outstanding, market capitalization, percentage change, price amplitude, trading volume, turnover value, turnover rate, bulls, bears, long positions and short positions. Each section uses bullet items matching the names and order in its diagram. All numbers are teaching assumptions; add later terms at the same heading level in a suitable learning order.
 
-章节 README 用 `[阅读全文](basic-terms.md)` 关联独立文章，首页章节卡片直接打开该文章，不重复列出卡片。继续迭代时只修改 Markdown 正文，目录自动更新；图片在正文中按相对路径插入，完整展示。迁移文字只需复制 Markdown；含本地图片时同时带上图片并保持相对路径。《基础名词》按股票、股价、股本、市值、涨跌幅、振幅、成交量、成交额、换手率、多头、空头、做多、做空排列；每节使用与图区同名、同序的无序条目。数字均为教学假设，后续名词可按理解顺序插入同级 `##` 标题。
-
-以后新增知识点仍可先用纯 Markdown `> 配图预留`，完成配图后替换为相对路径图片。修订配图使用版本化文件名并保留旧稿；迁移图文时同时携带所引用的图片即可。
+New knowledge points may begin with a plain Markdown illustration placeholder, replaced by a relative image path when ready. Version revised illustrations and retain previous drafts; carry referenced images when migrating illustrated content.
