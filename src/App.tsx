@@ -147,6 +147,8 @@ function Home() {
   </>;
 }
 export default function App({ route = '' }: { route?: string }) {
-  const doc = content.docs.find(item => item.route === route);
+  // Cloudflare Pages redirects .html URLs to extensionless paths.
+  const normalizeRoute = (value: string) => value.replace(/(?:\/index)?\.html$/, '').replace(/\/+$/, '');
+  const doc = content.docs.find(item => normalizeRoute(item.route) === normalizeRoute(route));
   return doc ? <main className="reader" data-module={doc.module}><a className="back-link" href={`${base}${doc.module === 'knowledge' || doc.module === 'practices' ? '#' + doc.module : ''}`}>← 返回</a><ReadingBody reading={{ title: doc.title, html: doc.html, module: doc.module, toc: doc.toc }} /></main> : <Home />;
 }
