@@ -92,3 +92,9 @@ Articles use a narrow table of contents beside complete Markdown. The first sour
 Chapter READMEs link to standalone articles through “Read full article”; homepage chapter cards open the article directly rather than duplicating cards. Edit only Markdown bodies; navigation updates automatically. Insert relative-path images and display them in full. Copy Markdown to migrate text; when local images are included, carry them along and preserve relative paths. Basic Terms orders stocks, share price, shares outstanding, market capitalization, percentage change, price amplitude, trading volume, turnover value, turnover rate, bulls, bears, long positions and short positions. Each section uses bullet items matching the names and order in its diagram. All numbers are teaching assumptions; add later terms at the same heading level in a suitable learning order.
 
 New knowledge points may begin with a plain Markdown illustration placeholder, replaced by a relative image path when ready. Version revised illustrations and retain previous drafts; carry referenced images when migrating illustrated content.
+
+<!-- financex-batch:start -->
+## Video study notes
+
+This batch covers 158 locally recorded videos. FinanceX retains editable transcripts, recording-relative timestamps and summaries. [Website study notes](practices/video-study-notes.md) are updated as processing completes and connect to existing practice entries. The page reports the actual completed count; transcription, specialist terms and historical market interpretations remain subject to review.
+<!-- financex-batch:end -->

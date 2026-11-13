@@ -23,3 +23,9 @@
 - [13｜日月神功](13-riyue-shengong.md)
 
 [目标与维护规则](../README.md#维护规则) · [返回首页](../README.md)
+
+<!-- financex-study-notes:start -->
+## 视频学习整理
+
+[阅读视频学习整理](video-study-notes.md)：集中查看已完成的视频总结，并按标题回看不同日期的案例。完整逐句文稿与时间定位保留在 FinanceX 本地库；自动整理内容仍需核对。
+<!-- financex-study-notes:end -->
