@@ -105,4 +105,4 @@ A standalone step-by-step stock lesson at `/learn/stock` is linked from Basic Te
 
 The transparent Anjing crayon character was generated with built-in ImageGen; the asset and actual prompt are kept in `assets/interactive/`. Share counts, ratios and exchange directions are controlled by the frontend. This remains a pilot pending joint learning and feedback, not proof of learning effectiveness.
 
-The pilot UI now uses a minimal lesson console: quiet column dividers, monospaced indices, dark action buttons and muted green state navigation replace outer cards and repeated callouts. Below 960px, the layout stacks vertically. Overall visual and learning quality remain pending user review.
+The pilot now uses a warm-paper game-course interface: pastel green/violet controls, fine dark outlines, offset hard shadows, rounded buttons, linked step circles and press feedback retain the crayon diagrams and concise content. The previous tool-panel styling was not accepted. Below 960px, the layout stacks vertically. Visual and learning quality remain pending user review.

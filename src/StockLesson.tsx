@@ -138,7 +138,7 @@ export default function StockLesson({ source }: { source: Source }) {
   }, [step]);
   const shownHtml = source.items[step === 0 ? 0 : step === 1 ? 1 : 2].html;
   return <main className="stock-lesson" style={{ '--exchange-duration': `${EXCHANGE_MS}ms`, '--wax-rough': `url(#${id}-rough)`, '--wax-blue': `url(#${id}-blue)`, '--wax-gold': `url(#${id}-gold)`, '--wax-green': `url(#${id}-green)` } as CSSProperties}>
-    <header className="stock-topbar"><a href={`${__SITE_BASE__}#knowledge`}>← 知识</a><span>FINANCE / PLAY</span><span className="stock-pilot-tag"><i aria-hidden="true" />互动样稿</span></header>
+    <header className="stock-topbar"><a href={`${__SITE_BASE__}#knowledge`}>← 知识</a><span>FINANCE JOURNEY</span><span className="stock-pilot-tag"><i aria-hidden="true" />互动样稿</span></header>
     <div className="stock-shell">
       <aside className="stock-rail"><p className="stock-eyebrow">基础名词 <span>{source.terms.length}</span></p><nav aria-label="基础名词">{source.terms.map((term, i) => <a key={term.id} href={term.title === '股票' ? `${__SITE_BASE__}learn/stock.html` : `${article}#${encodeURIComponent(term.id)}`} aria-current={term.title === '股票' ? 'page' : undefined}><span>{String(i + 1).padStart(2, '0')}</span>{term.title}{term.title === '股票' && <span className="stock-rail-dot" />}</a>)}</nav><a className="stock-original-link" href={article}>阅读完整图文 ↗</a></aside>
       <section className="stock-lesson-main" aria-label="股票互动演示">
