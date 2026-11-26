@@ -111,6 +111,24 @@ for (const image of images) {
   await mkdir(path.posix.dirname(`public/content/${image}`), { recursive: true });
   await copyFile(image, `public/content/${image}`);
 }
+// The interactive stock pilot reads the same Markdown as the complete article.
+const basics = await readFile('knowledge/basic-terms.md', 'utf8');
+const stockSection = basics.match(/^## 股票\s*\n([\s\S]*?)(?=^## |$(?![\s\S]))/m)?.[1];
+if (!stockSection) throw new Error('Missing stock section in knowledge/basic-terms.md');
+const stockTokens = marked.lexer(stockSection);
+const stockList = stockTokens.find(token => token.type === 'list');
+const stockImage = stockTokens.flatMap(token => token.type === 'paragraph' ? token.tokens : []).find(token => token.type === 'image');
+if (!stockList || stockList.items.length !== 3 || !stockImage) throw new Error('Stock lesson requires three source bullets and a summary image');
+const stockLesson = {
+  terms: docs.find(doc => doc.file === 'knowledge/basic-terms.md').toc.filter(item => item.level === 2),
+  ownershipLeadHtml: html(stockList.items[0].text.replace(/^\*\*.+?\*\*[：:]\s*/, '').split('假设')[0], 'knowledge/basic-terms.md'),
+  items: stockList.items.map(item => {
+    const label = item.text.match(/^\*\*(.+?)\*\*[：:]/)?.[1];
+    if (!label) throw new Error('Stock lesson source bullet must have a label');
+    return { label, html: html(item.text.replace(/^\*\*.+?\*\*[：:]\s*/, ''), 'knowledge/basic-terms.md') };
+  }),
+  image: { src: `${base}content/${path.posix.normalize(path.posix.join('knowledge', stockImage.href))}`, alt: stockImage.text },
+};
 await mkdir('src/generated', { recursive: true });
-await writeFile('src/generated/content.json', JSON.stringify({ docs, outline }, null, 2));
+await writeFile('src/generated/content.json', JSON.stringify({ docs, outline, stockLesson }, null, 2));
 console.log(`Content: ${outline.filter(x => !x.group).length} outline sections, ${docs.length} Markdown documents.`);

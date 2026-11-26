@@ -98,3 +98,9 @@ New knowledge points may begin with a plain Markdown illustration placeholder, r
 
 This batch covers 158 locally recorded videos. FinanceX retains editable transcripts, recording-relative timestamps and summaries. [Website study notes](practices/video-study-notes.md) are updated as processing completes and connect to existing practice entries. The page reports the actual completed count; transcription, specialist terms and historical market interpretations remain subject to review.
 <!-- financex-batch:end -->
+
+## Interactive stock pilot
+
+A standalone step-by-step stock lesson at `/learn/stock` is linked from Basic Terms. Its four steps cover ownership, issuing new shares, shareholder transfers, and a complete review. Readers can compare 1/5/10-share assumptions, replay stock/money exchanges, and contrast a transfer with a company profit distribution. Explanations and the summary image continue to use `knowledge/basic-terms.md`; the approved stock v8 image is retained.
+
+The transparent Anjing crayon character was generated with built-in ImageGen; the asset and actual prompt are kept in `assets/interactive/`. Share counts, ratios and exchange directions are controlled by the frontend. This remains a pilot pending joint learning and feedback, not proof of learning effectiveness.

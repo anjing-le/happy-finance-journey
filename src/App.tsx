@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import content from './generated/content.json';
+import StockLesson from './StockLesson';
 
 const base = __SITE_BASE__;
 const columns = [{ id: 'knowledge', label: '知识' }, { id: 'practices', label: '最佳实践' }, { id: 'activities', label: '活动' }];
-type Reading = { title: string; html: string; module: string; toc?: { id: string; title: string; level: number }[] };
+type Reading = { title: string; html: string; module: string; file?: string; toc?: { id: string; title: string; level: number }[] };
 function Markdown({ html }: { html: string }) {
   const [image, setImage] = useState<{ src: string; alt: string } | null>(null);
   const [zoomed, setZoomed] = useState(false);
@@ -34,6 +35,12 @@ function ReadingBody({ reading }: { reading: Reading }) {
   const [position, setPosition] = useState({ id: headings[0]?.id || '', progress: 0 });
   const copy = useRef<HTMLDivElement>(null);
   const endTarget = useRef<string | null>(null);
+  useEffect(() => {
+    const hash = decodeURIComponent(location.hash.slice(1));
+    if (!headings.some(heading => heading.id === hash)) return;
+    const frame = requestAnimationFrame(() => jump(hash));
+    return () => cancelAnimationFrame(frame);
+  }, [reading.html]);
   useEffect(() => {
     const parent = copy.current;
     if (!parent) return;
@@ -91,12 +98,15 @@ function ReadingBody({ reading }: { reading: Reading }) {
   if (!headings.length) return <Markdown html={reading.html} />;
   return <div className="reading-layout">
     <nav className="article-index" aria-label="文章目录">{headings.map(heading => <a key={heading.id} href={`#${heading.id}`} aria-current={position.id === heading.id ? 'location' : undefined} style={position.id === heading.id ? { '--reading-progress': `${position.progress}%` } as CSSProperties : undefined} onClick={event => { event.preventDefault(); jump(heading.id); }}>{heading.title}</a>)}</nav>
-    <div className="reading-copy" ref={copy} tabIndex={0} role="region" aria-label="文章正文" onWheel={resumeReading} onTouchStart={resumeReading} onKeyDown={event => { if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) resumeReading(); }}><Markdown html={reading.html} /></div>
+    <div className="reading-copy" ref={copy} tabIndex={0} role="region" aria-label="文章正文" onWheel={resumeReading} onTouchStart={resumeReading} onKeyDown={event => { if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) resumeReading(); }}>
+      {reading.file === 'knowledge/basic-terms.md' && <a className="stock-pilot-entry" href={`${base}learn/stock.html`}><span>股票 · 分步学懂</span><span>看看股份、钱和股票怎么走 ↗</span></a>}
+      <Markdown html={reading.html} />
+    </div>
   </div>;
 }
 function Articles({ module, open }: { module: string; open: (reading: Reading) => void }) {
   const articles = content.docs.filter(doc => doc.module === module && !doc.file.endsWith('/README.md') && !doc.file.endsWith('/DESIGN.md') && !content.outline.some(item => item.articleFile === doc.file));
-  return articles.length ? <ul className="slots">{articles.map(doc => <li key={doc.file}><button className="block" aria-haspopup="dialog" onClick={() => open({ title: doc.title, html: doc.html, module, toc: doc.toc })}>{doc.title}</button></li>)}</ul> : null;
+  return articles.length ? <ul className="slots">{articles.map(doc => <li key={doc.file}><button className="block" aria-haspopup="dialog" onClick={() => open({ title: doc.title, html: doc.html, module, file: doc.file, toc: doc.toc })}>{doc.title}</button></li>)}</ul> : null;
 }
 function Home() {
   const [reading, setReading] = useState<Reading | null>(null);
@@ -135,7 +145,7 @@ function Home() {
     <main className="workspace" aria-label="金融知识与实践">
       <nav className="column-switch" aria-label="切换栏目">{columns.map(column => <button key={column.id} data-column={column.id} onClick={() => jump(column.id)} aria-current={activeColumn === column.id ? 'true' : undefined}>{column.label}</button>)}</nav>
       <div className="board" ref={board} onScroll={syncColumn}>
-        <section id="knowledge" className="column" aria-label="知识"><h2 className="column-label">知识</h2><div className="slots">{content.outline.filter(item => !item.group && !['最终阶段：形成自己的体系', '学习方式'].includes(item.title)).map(item => <button className="block" key={item.id} aria-haspopup="dialog" onClick={() => setReading({ title: item.title, html: item.html, module: 'knowledge', toc: item.toc })}>{item.category && <span className="chapter-category">{item.category}</span>}<span className="chapter-title">{item.title}</span></button>)}</div><Articles module="knowledge" open={setReading} /></section>
+        <section id="knowledge" className="column" aria-label="知识"><h2 className="column-label">知识</h2><div className="slots">{content.outline.filter(item => !item.group && !['最终阶段：形成自己的体系', '学习方式'].includes(item.title)).map(item => <button className="block" key={item.id} aria-haspopup="dialog" onClick={() => setReading({ title: item.title, html: item.html, module: 'knowledge', file: item.articleFile, toc: item.toc })}>{item.category && <span className="chapter-category">{item.category}</span>}<span className="chapter-title">{item.title}</span></button>)}</div><Articles module="knowledge" open={setReading} /></section>
         <section id="practices" className="column" aria-label="最佳实践"><h2 className="column-label">最佳实践</h2><Articles module="practices" open={setReading} />{!content.docs.some(doc => doc.module === 'practices' && !doc.file.endsWith('/README.md') && !doc.file.endsWith('/DESIGN.md')) && <p className="empty">尚未收录</p>}</section>
         <section id="activities" className="column" aria-label="活动"><h2 className="column-label">活动</h2><p className="empty">暂缓</p></section>
       </div>
@@ -149,6 +159,7 @@ function Home() {
 export default function App({ route = '' }: { route?: string }) {
   // Cloudflare Pages redirects .html URLs to extensionless paths.
   const normalizeRoute = (value: string) => value.replace(/(?:\/index)?\.html$/, '').replace(/\/+$/, '');
+  if (normalizeRoute(route) === 'learn/stock') return <StockLesson source={content.stockLesson} />;
   const doc = content.docs.find(item => normalizeRoute(item.route) === normalizeRoute(route));
-  return doc ? <main className="reader" data-module={doc.module}><a className="back-link" href={`${base}${doc.module === 'knowledge' || doc.module === 'practices' ? '#' + doc.module : ''}`}>← 返回</a><ReadingBody reading={{ title: doc.title, html: doc.html, module: doc.module, toc: doc.toc }} /></main> : <Home />;
+  return doc ? <main className="reader" data-module={doc.module}><a className="back-link" href={`${base}${doc.module === 'knowledge' || doc.module === 'practices' ? '#' + doc.module : ''}`}>← 返回</a><ReadingBody reading={{ title: doc.title, html: doc.html, module: doc.module, file: doc.file, toc: doc.toc }} /></main> : <Home />;
 }
