@@ -113,7 +113,7 @@ export default function StockLesson({ source }: { source: Source }) {
     if (timer.current) clearTimeout(timer.current);
     setStep(Math.max(0, Math.min(steps.length - 1, next)));
     setPhase('ready'); setDividend(false); setAnswer(null);
-    if (matchMedia('(max-width: 800px)').matches) window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    if (matchMedia('(max-width: 960px)').matches) window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }
   function play() {
     if (timer.current) clearTimeout(timer.current);
@@ -138,26 +138,25 @@ export default function StockLesson({ source }: { source: Source }) {
   }, [step]);
   const shownHtml = source.items[step === 0 ? 0 : step === 1 ? 1 : 2].html;
   return <main className="stock-lesson" style={{ '--exchange-duration': `${EXCHANGE_MS}ms`, '--wax-rough': `url(#${id}-rough)`, '--wax-blue': `url(#${id}-blue)`, '--wax-gold': `url(#${id}-gold)`, '--wax-green': `url(#${id}-green)` } as CSSProperties}>
-    <header className="stock-topbar"><a href={`${__SITE_BASE__}#knowledge`}>← 知识</a><span>安静 の finance journey</span><span className="stock-pilot-tag">互动样稿</span></header>
+    <header className="stock-topbar"><a href={`${__SITE_BASE__}#knowledge`}>← 知识</a><span>FINANCE / PLAY</span><span className="stock-pilot-tag"><i aria-hidden="true" />互动样稿</span></header>
     <div className="stock-shell">
-      <aside className="stock-rail"><p className="stock-eyebrow">01 / 基础名词</p><nav aria-label="基础名词">{source.terms.map((term, i) => <a key={term.id} href={term.title === '股票' ? `${__SITE_BASE__}learn/stock.html` : `${article}#${encodeURIComponent(term.id)}`} aria-current={term.title === '股票' ? 'page' : undefined}><span>{String(i + 1).padStart(2, '0')}</span>{term.title}{term.title === '股票' && <span className="stock-rail-dot" />}</a>)}</nav><a className="stock-original-link" href={article}>阅读完整图文 ↗</a></aside>
+      <aside className="stock-rail"><p className="stock-eyebrow">基础名词 <span>{source.terms.length}</span></p><nav aria-label="基础名词">{source.terms.map((term, i) => <a key={term.id} href={term.title === '股票' ? `${__SITE_BASE__}learn/stock.html` : `${article}#${encodeURIComponent(term.id)}`} aria-current={term.title === '股票' ? 'page' : undefined}><span>{String(i + 1).padStart(2, '0')}</span>{term.title}{term.title === '股票' && <span className="stock-rail-dot" />}</a>)}</nav><a className="stock-original-link" href={article}>阅读完整图文 ↗</a></aside>
       <section className="stock-lesson-main" aria-label="股票互动演示">
-        <header className="stock-lesson-heading"><div><p className="stock-eyebrow">基础名词 / 从这里开始</p><h1>股票<span>一小份股份，三种关系。</span></h1></div><span className="stock-step-count">{String(step + 1).padStart(2, '0')}<small> / 04</small></span></header>
+        <header className="stock-lesson-heading"><h1>股票<span>交互学习</span></h1><span className="stock-step-count">{String(step + 1).padStart(2, '0')}<small> / 04</small></span></header>
         <div className="stock-paper" data-step={step}>
           <div className="stock-scene-label"><span className={`stock-scene-dot step-${step}`} />{step === 0 ? '股份与股东' : step === 1 ? '公司与认购人' : step === 2 ? dividend ? '公司与股东' : '卖方与买方' : '一张图，回看全部'}</div>
           <div className="stock-stage" aria-label={question}>
             {step === 3 ? <img className="stock-review-image" src={source.image.src} alt={source.image.alt} width="1672" height="941" /> : <svg viewBox="0 0 720 460" className="stock-scene" role="img" aria-label={step === 0 ? `假设公司100股，你持有${shares}股，占${shares}%` : step === 1 ? '公司给认购人新股，认购人把钱给公司' : dividend ? '公司决定分配利润时把钱给股东' : '你给买方股票，买方把钱给你'}><DrawingDefs id={id} />{step === 0 ? <Ownership shares={shares} id={id} /> : <Exchange step={step} phase={phase} replay={replay} dividend={dividend} id={id} />}</svg>}
           </div>
           <div className="stock-scene-controls">
-            {step === 0 ? <div className="stock-share-options"><span>换个持股假设</span>{[1, 5, 10].map(n => <button key={n} type="button" aria-pressed={shares === n} onClick={() => setShares(n)}>{n} 股</button>)}</div> : step === 3 ? <span className="stock-quiet-note">回看原稿：以持有 1 股为例。</span> : <><span className="stock-quiet-note" aria-live="polite">{phase === 'done' ? '演示完成，再确认一次钱的去向。' : '独立场景示意，点击看交换。'}</span><button className="stock-replay" type="button" disabled={phase === 'playing'} onClick={play}>{phase === 'playing' ? '正在演示…' : phase === 'done' ? '↻ 重播演示' : '▷ 播放演示'}</button></>}
+            {step === 0 ? <div className="stock-share-options"><span>换个持股假设</span>{[1, 5, 10].map(n => <button key={n} type="button" aria-pressed={shares === n} onClick={() => setShares(n)}>{n} 股</button>)}</div> : step === 3 ? <span className="stock-quiet-note">回看原稿：以持有 1 股为例。</span> : <><span className="stock-quiet-note" aria-live="polite">{phase === 'done' ? '演示完成' : '独立场景示意'}</span><button className="stock-replay" type="button" disabled={phase === 'playing'} onClick={play}>{phase === 'playing' ? '演示中…' : phase === 'done' ? '↻ 重播' : '▷ 播放'}</button></>}
           </div>
         </div>
         <nav className="stock-timeline" aria-label="学习步骤">{steps.map((s, i) => <button key={s.title} type="button" aria-current={i === step ? 'step' : undefined} onClick={() => go(i)}><span className="stock-step-number">{i + 1}</span><span>{s.title}</span></button>)}</nav>
-        <p className="stock-lesson-footnote">数字是教学假设 · 可随时返回重看 <span>← → 切换步骤</span></p>
+        <p className="stock-lesson-footnote">教学假设<span>← → 切换</span></p>
       </section>
-      <aside className="stock-guide" aria-label="本步讲解"><div className="stock-guide-content" aria-live="polite" aria-atomic="true"><div className="stock-guide-kicker"><span>第 {step + 1} / 4 步</span><span>{current.tag}</span></div><h2>{question}</h2>
+      <aside className="stock-guide" aria-label="本步讲解"><div className="stock-guide-content" aria-live="polite" aria-atomic="true"><div className="stock-guide-kicker">{current.tag}</div><h2>{question}</h2>
         {step === 0 ? <div className="stock-source-copy"><div dangerouslySetInnerHTML={{ __html: source.ownershipLeadHtml }} /><p>假设公司共 100 股，你持有 <strong>{shares} 股</strong>，就拥有 <strong>{shares}/100（{shares}%）</strong>，也是股东之一。</p></div> : step < 3 ? <div className="stock-source-copy" dangerouslySetInnerHTML={{ __html: shownHtml }} /> : <ul className="stock-summary-copy">{source.items.map(item => <li key={item.label}><strong>{item.label}</strong><div dangerouslySetInnerHTML={{ __html: item.html }} /></li>)}</ul>}
-        <div className={`stock-key-point point-${step}`}><span>记住这一点</span><p>{step === 0 ? '持股多少不同，都是股东。' : step === 1 ? '发行新股时，认购的钱进入公司。' : step === 2 ? dividend ? '公司不一定分配利润。' : '你转让股票，钱来自另一位买方。' : '发行新股和股东转让，钱的接收方不同。'}</p></div>
         {step === 2 && <><div className="stock-scene-switch" aria-label="查看股东的两种关系"><button type="button" aria-pressed={!dividend} onClick={() => changeMode(false)}>转让股票</button><button type="button" aria-pressed={dividend} onClick={() => changeMode(true)}>分配利润</button></div>{!dividend && <div className="stock-check"><p>卖出这股，谁付钱给你？</p><div><button type="button" aria-pressed={answer === 'company'} onClick={() => setAnswer('company')}>公司</button><button type="button" aria-pressed={answer === 'buyer'} onClick={() => setAnswer('buyer')}>买方</button></div><p className="stock-answer" role="status">{answer === 'buyer' ? '对，是买方。股票给买方，钱给你。' : answer === 'company' ? '再看绿色箭头：这次是买方付钱，公司没有参与转让。' : '先想一下，也可以重播看看。'}</p></div>}</>}
       </div><footer className="stock-guide-footer"><button type="button" disabled={step === 0} onClick={() => go(step - 1)}>← 上一步</button>{step < 3 ? <button className="stock-next" type="button" onClick={() => go(step + 1)}>下一步 →</button> : <button className="stock-next" type="button" onClick={() => go(0)}>再看一遍 ↺</button>}</footer></aside>
     </div>
